@@ -3,7 +3,7 @@ import cPickle as pickle
 import numpy as np
 from Circle_assembly import floris_assembly_opt_AEP
 from scipy.io import loadmat
-
+import os
 import time
 
 useSubset = True
@@ -42,7 +42,7 @@ airDensity = 1.1716
 np.set_printoptions(formatter={'float': '{: 0.3f}'.format})
 
 for windDirectionI, windDirection in enumerate(windDirectionsFLORIS):
-    
+
     print 'wind direction %f deg' % windDirectionsWindRose[windDirectionI]
 
     baselineFloris = floris_assembly_opt_AEP(nTurbines=nTurbines, nDirections=1, optimize_yaw=False, optimize_position=False, datasize=datasize, nSamples = 0, nSpeeds = 1)
@@ -64,9 +64,9 @@ for windDirectionI, windDirection in enumerate(windDirectionsFLORIS):
     baselineFloris.run()
     baselinePower = np.sum(baselineFloris.floris_power_0.wt_power)
     baselinePowers.append(baselinePower)
-    
+
     print 'baseline power %f kW' % baselinePower
-    
+
     optFloris = floris_assembly_opt_AEP(nTurbines=nTurbines, nDirections=1, optimize_yaw=True, optimize_position=False, datasize=datasize, nSamples = 0, nSpeeds = 1, maxiter = maxiter)
 
     optFloris.windrose_directions    = np.array([windDirection]);
@@ -93,15 +93,96 @@ for windDirectionI, windDirection in enumerate(windDirectionsFLORIS):
 
     increasePercentage = 100 * (optPower - baselinePower) / baselinePower
     increasePercentages.append(increasePercentage)
-    
+
     optYaw = optFloris.yaw_0
     optYaws.append(optYaw)
 
-    print 'optimal yaw %s deg' % optYaw 
+    print 'optimal yaw %s deg' % optYaw
     print 'optimal power %f kW' % optPower
 
     print 'increase %f %%' % increasePercentage
     print '----------------------'
+
+
+
+
+
+# Rewrite the file Siminfo.txt with the Information of the simulation
+with open("Siminfo.txt", "w") as output:
+	output.write(str('Turbine positions for baseline and optimized layouts'))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Base Park Layout:   '))
+	output.write(str(Baselayoutdoc))
+	output.write(str('\n'))
+	output.write(str('Number of Turbines:   '))
+	output.write(str(jp))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Number of Wind directions:   '))
+	output.write(str(wind_dir.size))
+	output.write(str('\n'))
+	output.write(str(wind_dir))
+	output.write(str('\n'))
+	output.write(str('Number of Wind speeds:   '))
+	output.write(str(wind_speeds.size))
+	output.write(str('\n'))
+	output.write(str(wind_speeds))
+	output.write(str('\n'))
+	output.write(str('Number of Wind frequencies:   '))
+	output.write(str(wind_frec.size))
+	output.write(str('\n'))
+	output.write(str(wind_frec))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Baseline X:   '))
+	output.write(str(baselineFloris.turbineX))
+	output.write(str('\n'))
+	output.write(str('Baseline Y:   '))
+	output.write(str(baselineFloris.turbineY))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Optimized X:   '))
+	output.write(str(optFloris.turbineX))
+	output.write(str('\n'))
+	output.write(str('Optimized Y:   '))
+	output.write(str(optFloris.turbineY))
+	output.write(str('\n'))
+	output.write(str('Optimized Yaws:   '))
+	output.write(str(optYaw))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Baseline Power:   '))
+	output.write(str(baselinePower))
+	output.write(str('  MW'))
+	output.write(str('\n'))
+	output.write(str('Optimized Power:   '))
+	output.write(str(optPower))
+	output.write(str('  MW'))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Baseline AEP:   '))
+	output.write(str(baselineAEP))
+	output.write(str('  MWh'))
+	output.write(str('\n'))
+	output.write(str('Optimized AEP:   '))
+	output.write(str(optAEP))
+	output.write(str('  MWh'))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('Increase percentage of power :   '))
+	output.write(str(increasePercentage))
+	output.write(str('  %'))
+	output.write(str('\n'))
+	output.write(str('\n'))
+	output.write(str('FLORIS yaw optimization took '))
+	output.write(str(toc-tic))
+	output.write(str(' seconds   =   '))
+	output.write(str((toc-tic)/60))
+	output.write(str('  Minutes'))
+
+#open the file turbinepos.txt
+os.startfile('Siminfo.txt')
 
 baselinePowers = np.array(baselinePowers)
 optPowers = np.array(optPowers)
@@ -189,7 +270,7 @@ for axI, ax in enumerate(axes):
         turbineX = visualFloris.turbineX[turbI]
         turbineY = visualFloris.turbineY[turbI]
         rotorDiameter = visualFloris.rotorDiameter[turbI]
-        
+
         rotorAbsAngle = (windDirectionFLORISmaxIncrease + yaw)*np.pi/180.
         rotationMatrix = np.array([(np.cos(rotorAbsAngle), -np.sin(rotorAbsAngle)),(np.sin(rotorAbsAngle), np.cos(rotorAbsAngle))])
         rotorX = np.array([0,0])
