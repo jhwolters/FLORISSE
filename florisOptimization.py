@@ -97,11 +97,16 @@ for windDirectionI, windDirection in enumerate(windDirectionsFLORIS):
     optYaw = optFloris.yaw_0
     optYaws.append(optYaw)
 
+    
+    print '-------------------------------------------'
+    print '-------------------------------------------'
     print 'optimal yaw %s deg' % optYaw 
     print 'optimal power %f kW' % optPower
 
     print 'increase %f %%' % increasePercentage
-    print '----------------------'
+    print '-------------------------------------------'
+    print '-------------------------------------------'
+    
 
 baselinePowers = np.array(baselinePowers)
 optPowers = np.array(optPowers)
